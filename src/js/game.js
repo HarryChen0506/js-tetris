@@ -26,7 +26,7 @@ function Game(config){
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,1,0,0,0,0],
-        [1,2,0,1,1,1,1,0,0,0],
+        [1,1,0,1,1,1,1,0,0,0],
     ]
     var nextData = [];
     var curData = [];
@@ -118,7 +118,7 @@ function Game(config){
         nextDiv = doms.next || document.getElementById('next');  //下个方块容器
         dirDiv = doms.dir || document.getElementById('dir');    // 方向容器  
         // curSquare = nextSquare = new Square();  //下一个方块复制给当前
-        curSquare = nextSquare = squareFactory(7, 0);  //下一个方块复制给当前
+        curSquare = nextSquare = squareFactory(6, 0);  //下一个方块复制给当前
         render();   
         fresh();   
     }
@@ -172,6 +172,7 @@ function Game(config){
         return true
     }
 
+    
     //显示操作
     function showAct(container, act){
         container.innerHTML = act;
@@ -241,6 +242,20 @@ function Game(config){
             // this.down()
         }
     }
+    // 固定当前方块
+    function fixed(){
+         // 开始位置          
+        for(var i=0; i<curSquare.data.length; i++){
+            for(var j=0; j<curSquare.data[i].length; j++){
+                if(checkDotValid(curSquare.origin, i, j)){
+                    if(gameData[curSquare.origin.x + i][curSquare.origin.y + j] === 2){
+                        gameData[curSquare.origin.x + i][curSquare.origin.y + j] = 1
+                    }                    
+                }                
+            }
+        }
+        refreshDiv(gameData, gameDivs)          //刷新游戏区
+    }
     
     // 导出api
     this.init = init;
@@ -249,4 +264,5 @@ function Game(config){
     this.right = right;  
     this.rotate = rotate;  
     this.fall = fall;
+    this.fixed = fixed;
 }
