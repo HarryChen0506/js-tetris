@@ -14,19 +14,19 @@ function bindEvent(){
     document.addEventListener('keydown', function(e){ 
         switch(e.keyCode){
             case 38:                
-                
+                game.rotate();
                 break;
             case 39:
-                
+                game.right();
                 break;
             case 37:
-                
+                game.left();
                 break;
             case 40:
                 game.down();
                 break;
             case 32:
-                
+                game.fall();
                 break;
             default:
                 break;

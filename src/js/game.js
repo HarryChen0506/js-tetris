@@ -25,10 +25,11 @@ function Game(config){
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [1,2,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,1,0,0,0,0],
+        [1,2,0,1,1,1,1,0,0,0],
     ]
-    var nextData = []
+    var nextData = [];
+    var curData = [];
     var origin = {
         x: 0,
         y: 0
@@ -46,22 +47,22 @@ function Game(config){
 
     // 方法
     //从方块拷贝数据到游戏区
-    function copyData(gameData, nextData, origin){
+    function copyData(gameData, curData, origin){
         // gameData 游戏数据
         // nextData 方块数据
         // 开始位置          
-        for(var i=0; i<nextData.length; i++){
-            for(var j=0; j<nextData[i].length; j++){
+        for(var i=0; i<curData.length; i++){
+            for(var j=0; j<curData[i].length; j++){
                 if(checkDotValid(origin, i, j)){
-                    gameData[origin.x + i][origin.y + j] = nextData[i][j]
+                    gameData[origin.x + i][origin.y + j] = curData[i][j]
                 }                
             }
         }
     }
     //清空游戏区数据
-    function clearData(gameData, nextData, origin, value){
-        for(var i=0; i<nextData.length; i++){        
-            for(var j=0; j<nextData[i].length; j++){               
+    function clearData(gameData, curData, origin, value){
+        for(var i=0; i<curData.length; i++){        
+            for(var j=0; j<curData[i].length; j++){               
                 if(checkDotValid(origin, i, j)){
                     gameData[origin.x + i][origin.y + j] = value                    
                 }                 
@@ -106,8 +107,8 @@ function Game(config){
     }
     // 刷新页面
     function fresh(){
-        clearData(gameData, nextSquare.data, nextSquare.origin, 0);                 //先清空旧数据
-        copyData(gameData, nextSquare.data, nextSquare.origin)    //拷贝新数据
+        clearData(gameData, curSquare.data, curSquare.origin, 0);                 //先清空旧数据
+        copyData(gameData, curSquare.data, curSquare.origin)    //拷贝新数据
         refreshDiv(gameData, gameDivs)                            //刷新游戏区
         refreshDiv(nextSquare.data, nextDivs)                            //刷新方块
     }
@@ -116,7 +117,8 @@ function Game(config){
         gameDiv = doms.game || document.getElementById('game');  //游戏区容器
         nextDiv = doms.next || document.getElementById('next');  //下个方块容器
         dirDiv = doms.dir || document.getElementById('dir');    // 方向容器  
-        curSquare = nextSquare = new Square();  //下一个方块复制给当前
+        // curSquare = nextSquare = new Square();  //下一个方块复制给当前
+        curSquare = nextSquare = squareFactory(7, 0);  //下一个方块复制给当前
         render();   
         fresh();   
     }
@@ -150,6 +152,25 @@ function Game(config){
         }
         return true
     }
+   
+    /**
+     * 检测方块整体是否合法
+     * @param {*} origin 方块的原点位置
+     * @param {*} data   方块的数据
+     */
+    function checkSquareValid(origin, data){
+        for(var i=0; i<data.length; i++){
+            for(var j=0; j<data[i].length; j++){
+                if(data[i][j]!==0){
+                    // 该点是实体点
+                    if(!checkDotValid(origin, i, j)){
+                        return false
+                    }                    
+                }
+            }
+        }
+        return true
+    }
 
     //显示操作
     function showAct(container, act){
@@ -158,21 +179,74 @@ function Game(config){
     }   
     //向下 
     function nextDown(){
-        clearData(gameData, nextSquare.data, nextSquare.origin, 0);                  //先清空旧数据
-        nextSquare.origin.x = nextSquare.origin.x +1;   // 行坐标加1       
-        copyData(gameData, nextSquare.data, nextSquare.origin)    //拷贝新数据
+        clearData(gameData, curSquare.data, curSquare.origin, 0);                  //先清空旧数据
+        curSquare.down();   //       
+        copyData(gameData, curSquare.data, curSquare.origin)    //拷贝新数据
         refreshDiv(gameData, gameDivs)          //刷新游戏区
     }
     function down(){  
         showAct(dirDiv, 'down');
-        if(true){
-            // console.log('合法')
-            nextDown.call(this);           
+        if(curSquare.canDown(checkSquareValid)){
+            console.log('合法')
+            nextDown(); 
+            return true          
         }; 
+        return false
+    }
+    //向左
+    function nextLeft(){
+        clearData(gameData, curSquare.data, curSquare.origin, 0);                  //先清空旧数据
+        curSquare.left();   //        
+        copyData(gameData, curSquare.data, curSquare.origin)    //拷贝新数据
+        refreshDiv(gameData, gameDivs)          //刷新游戏区
+    }
+    function left(){  
+        showAct(dirDiv, 'left');
+        if(curSquare.canLeft(checkSquareValid)){
+            console.log('合法')
+            nextLeft();           
+        }; 
+    }
+    //向右
+    function nextRight(){
+        clearData(gameData, curSquare.data, curSquare.origin, 0);                  //先清空旧数据
+        curSquare.right();   //        
+        copyData(gameData, curSquare.data, curSquare.origin)    //拷贝新数据
+        refreshDiv(gameData, gameDivs)          //刷新游戏区
+    }
+    function right(){  
+        showAct(dirDiv, 'right');
+        if(curSquare.canRight(checkSquareValid)){
+            console.log('合法')
+            nextRight();           
+        }; 
+    }
+    //旋转
+    function nextRotate(){
+        clearData(gameData, curSquare.data, curSquare.origin, 0);                  //先清空旧数据        
+        curSquare.rotate();   // 旋转       
+        copyData(gameData, curSquare.data, curSquare.origin)    //拷贝新数据
+        refreshDiv(gameData, gameDivs)          //刷新游戏区
+    }
+    function rotate(){  
+        showAct(dirDiv, 'rotate');
+        if(curSquare.canRotate(checkSquareValid)){
+            console.log('合法')
+            nextRotate();           
+        }; 
+    }
+    // 坠落
+    function fall(){
+        while(this.down()){
+            // this.down()
+        }
     }
     
     // 导出api
     this.init = init;
-    this.down = down;
-    
+    this.down = down;    
+    this.left = left;    
+    this.right = right;  
+    this.rotate = rotate;  
+    this.fall = fall;
 }
