@@ -56,8 +56,10 @@ function Player(){
     function move(){
         if(!game.down()){
             // 如果不能继续向下，则将当前方块固定在底部
-            game.fixed()
-        }        
+            game.fixed();
+             // 执行下一条
+            game.runNext()
+        }    
     }
     //开始
     function run(){

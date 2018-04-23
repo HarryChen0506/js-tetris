@@ -46,6 +46,11 @@ function Game(config){
 
 
     // 方法
+    // 生成随机数
+    function createRandomNum(min, max){
+        // 1-7  0-3
+        return Math.floor(Math.random()*(max-min+1))+min
+    }
     //从方块拷贝数据到游戏区
     function copyData(gameData, curData, origin){
         // gameData 游戏数据
@@ -117,8 +122,8 @@ function Game(config){
         gameDiv = doms.game || document.getElementById('game');  //游戏区容器
         nextDiv = doms.next || document.getElementById('next');  //下个方块容器
         dirDiv = doms.dir || document.getElementById('dir');    // 方向容器  
-        // curSquare = nextSquare = new Square();  //下一个方块复制给当前
-        curSquare = nextSquare = squareFactory(6, 0);  //下一个方块复制给当前
+        curSquare  = squareFactory(createRandomNum(1, 7), createRandomNum(0, 3));  //下一个方块复制给当前
+        nextSquare = squareFactory(createRandomNum(1, 7), createRandomNum(0, 3));  //下一个方块复制给当前
         render();   
         fresh();   
     }
@@ -176,7 +181,7 @@ function Game(config){
     //显示操作
     function showAct(container, act){
         container.innerHTML = act;
-        console.log('act', act)
+        // console.log('act', act)
     }   
     //向下 
     function nextDown(){
@@ -257,6 +262,14 @@ function Game(config){
         refreshDiv(gameData, gameDivs)          //刷新游戏区
     }
     
+    // 执行下一条
+    function runNext(){
+        // console.log('next--');
+        curSquare = nextSquare; 
+        nextSquare = squareFactory(createRandomNum(1,7), createRandomNum(0,3));  //下一个方块复制给当前
+        refreshDiv(nextSquare.data, nextDivs);  //刷新下个方块
+    }
+    
     // 导出api
     this.init = init;
     this.down = down;    
@@ -265,4 +278,5 @@ function Game(config){
     this.rotate = rotate;  
     this.fall = fall;
     this.fixed = fixed;
+    this.runNext = runNext;
 }
