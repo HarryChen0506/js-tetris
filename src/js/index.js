@@ -9,7 +9,7 @@ function Player(){
     function bindEvent(){
         // var body = document.body;
         document.addEventListener('keydown', function(e){ 
-            console.log('e',e)
+            // console.log('e',e)
             switch(e.keyCode){
                 case 38:                
                     game.rotate();
@@ -57,8 +57,14 @@ function Player(){
         if(!game.down()){
             // 如果不能继续向下，则将当前方块固定在底部
             game.fixed();
+            // 检测能否消分
+            game.clearSquare(function(data){
+                if(data>0){
+                    console.log('score', data)
+                }               
+            });
              // 执行下一条
-            game.runNext()
+            game.runNext();
         }    
     }
     //开始

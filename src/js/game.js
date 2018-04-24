@@ -25,8 +25,8 @@ function Game(config){
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,1,0,0,0,0],
-        [1,1,0,1,1,1,1,0,0,0],
+        [1,1,1,1,1,1,1,1,0,0],
+        [1,1,1,1,1,1,1,1,0,0],
     ]
     var nextData = [];
     var curData = [];
@@ -193,7 +193,7 @@ function Game(config){
     function down(){  
         showAct(dirDiv, 'down');
         if(curSquare.canDown(checkSquareValid)){
-            console.log('合法')
+            // console.log('合法')
             nextDown(); 
             return true          
         }; 
@@ -209,7 +209,7 @@ function Game(config){
     function left(){  
         showAct(dirDiv, 'left');
         if(curSquare.canLeft(checkSquareValid)){
-            console.log('合法')
+            // console.log('合法')
             nextLeft();           
         }; 
     }
@@ -223,7 +223,7 @@ function Game(config){
     function right(){  
         showAct(dirDiv, 'right');
         if(curSquare.canRight(checkSquareValid)){
-            console.log('合法')
+            // console.log('合法')
             nextRight();           
         }; 
     }
@@ -237,7 +237,7 @@ function Game(config){
     function rotate(){  
         showAct(dirDiv, 'rotate');
         if(curSquare.canRotate(checkSquareValid)){
-            console.log('合法')
+            // console.log('合法')
             nextRotate();           
         }; 
     }
@@ -261,6 +261,36 @@ function Game(config){
         }
         refreshDiv(gameData, gameDivs)          //刷新游戏区
     }
+    // 消分
+    function clearSquare(next){    
+        var score = 0;
+        for(var i= gameData.length-1; i>0; i--){
+            var win = true;   // 默认该行是满的，可以得分
+            for(var j=0; j<gameData[i].length; j++){
+                if(gameData[i][j]!==1){
+                    win = false;
+                    break;
+                }
+            }
+            if(win){  
+                score++;
+                // 下移一行
+                for(var m=i;m>0;m-- ){
+                    for(var n=0; n<gameData[i].length; n++){
+                        gameData[m][n] = gameData[m-1][n];
+                    }
+                }    
+                // 第一行设为灰色
+                for(var k=0; k<gameData[0].length; k++){
+                    gameData[0][k] = 0;
+                }  
+                // 重新回到底行，在做循环判断
+                i++;
+            }            
+        }
+        typeof next==='function'&&next(score)
+    }
+    // 方块整体下移一行
     
     // 执行下一条
     function runNext(){
@@ -278,5 +308,6 @@ function Game(config){
     this.rotate = rotate;  
     this.fall = fall;
     this.fixed = fixed;
+    this.clearSquare = clearSquare;
     this.runNext = runNext;
 }
