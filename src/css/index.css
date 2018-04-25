@@ -31,6 +31,11 @@
     top:220px;
     left: 250px;
 } 
+.score {
+    position: absolute;
+    top:300px;
+    left: 250px;
+}
 .box {
     position: absolute;
     display: inline-block;

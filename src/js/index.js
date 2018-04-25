@@ -5,6 +5,7 @@ function Player(){
     var game;
     var status = 'pause'; //默认暂停 ‘run’
     var timerId;
+    var score = 0;
     // 绑定事件
     function bindEvent(){
         // var body = document.body;
@@ -50,7 +51,8 @@ function Player(){
             }
         });
         bindEvent();
-        run()
+        run();
+        showScore();
     }
     // 向下移动
     function move(){
@@ -59,8 +61,9 @@ function Player(){
             game.fixed();
             // 检测能否消分
             game.clearSquare(function(data){
-                if(data>0){
-                    console.log('score', data)
+                if(data>0){                    
+                    calScore(data);
+                    showScore();
                 }               
             });
              // 执行下一条
@@ -91,6 +94,31 @@ function Player(){
             // 开始
             run()
         }
+    }
+    //计算分数 
+    function calScore(level){       
+        switch(level){
+            case 1:
+                score += 10;
+                break;
+            case 2:
+                score += 30;
+                break;
+            case 3:
+                score += 60;
+                break;
+            case 4:
+                score += 80;
+                break;
+            default:
+                break
+        }
+    }
+    // 刷新分数
+    function showScore(){
+       var dom_score = document.getElementById('score');
+       dom_score.innerHTML = score;
+
     }
 
     //暴露接口
